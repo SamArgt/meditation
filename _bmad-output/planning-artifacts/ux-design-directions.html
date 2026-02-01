@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>meditation - Design Directions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #F5F7F9;
+            --surface: #FAFBFC;
+            --text-primary: #2D3748;
+            --text-secondary: #718096;
+            --accent: #5A8F9A;
+            --accent-hover: #4A7A84;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #1a1a2e;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #a0aec0;
+            font-size: 1rem;
+        }
+
+        .directions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .direction-card {
+            background: #16213e;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .direction-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .direction-label {
+            padding: 15px 20px;
+            background: rgba(90, 143, 154, 0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .direction-label h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .direction-label p {
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+
+        /* Phone mockup container */
+        .phone-mockup {
+            width: 280px;
+            height: 560px;
+            margin: 30px auto;
+            border-radius: 35px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ========== DIRECTION A: Centered Minimal ========== */
+        .direction-a .phone-screen {
+            background: var(--bg);
+            justify-content: center;
+            align-items: center;
+            padding: 40px 24px;
+        }
+
+        .direction-a .timer-display {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 56px;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin-bottom: 48px;
+        }
+
+        .direction-a .config-group {
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        .direction-a .config-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .direction-a .config-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            color: var(--text-primary);
+        }
+
+        .direction-a .start-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 32px;
+            cursor: pointer;
+        }
+
+        /* ========== DIRECTION B: Card-based ========== */
+        .direction-b .phone-screen {
+            background: var(--bg);
+            padding: 48px 20px 32px;
+            justify-content: space-between;
+        }
+
+        .direction-b .timer-section {
+            text-align: center;
+        }
+
+        .direction-b .timer-display {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 48px;
+            font-weight: 300;
+            color: var(--text-primary);
+        }
+
+        .direction-b .timer-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 8px;
+        }
+
+        .direction-b .config-cards {
+            display: flex;
+            gap: 12px;
+        }
+
+        .direction-b .config-card {
+            flex: 1;
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .direction-b .card-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .direction-b .card-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            color: var(--text-primary);
+        }
+
+        .direction-b .card-unit {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .direction-b .start-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* ========== DIRECTION C: Circular Focus ========== */
+        .direction-c .phone-screen {
+            background: var(--bg);
+            justify-content: center;
+            align-items: center;
+            padding: 32px 24px;
+        }
+
+        .direction-c .circle-timer {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: var(--surface);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            margin-bottom: 40px;
+        }
+
+        .direction-c .timer-display {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 42px;
+            font-weight: 300;
+            color: var(--text-primary);
+        }
+
+        .direction-c .timer-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        .direction-c .config-row {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .direction-c .config-item {
+            text-align: center;
+        }
+
+        .direction-c .config-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .direction-c .config-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            color: var(--text-primary);
+        }
+
+        .direction-c .start-btn {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 20px rgba(90, 143, 154, 0.3);
+        }
+
+        /* ========== DIRECTION D: Stepper Controls ========== */
+        .direction-d .phone-screen {
+            background: var(--bg);
+            padding: 48px 24px 32px;
+            justify-content: space-between;
+        }
+
+        .direction-d .timer-section {
+            text-align: center;
+        }
+
+        .direction-d .timer-display {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 52px;
+            font-weight: 300;
+            color: var(--text-primary);
+        }
+
+        .direction-d .config-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .direction-d .stepper-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 12px 16px;
+        }
+
+        .direction-d .stepper-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .direction-d .stepper-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .direction-d .stepper-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .direction-d .stepper-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            color: var(--text-primary);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .direction-d .start-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* ========== DIRECTION E: Ultra Minimal ========== */
+        .direction-e .phone-screen {
+            background: var(--bg);
+            justify-content: center;
+            align-items: center;
+            padding: 40px 32px;
+        }
+
+        .direction-e .timer-display {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 64px;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin-bottom: 64px;
+        }
+
+        .direction-e .config-inline {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 64px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .direction-e .config-inline span {
+            color: var(--text-primary);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+        }
+
+        .direction-e .start-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* ========== DIRECTION F: Session View ========== */
+        .direction-f .phone-screen {
+            background: var(--bg);
+            justify-content: center;
+            align-items: center;
+            padding: 40px 24px;
+        }
+
+        .direction-f .session-timer {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 72px;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .direction-f .session-remaining {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+        }
+
+        .direction-f .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin-bottom: 48px;
+            overflow: hidden;
+        }
+
+        .direction-f .progress-fill {
+            width: 35%;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .direction-f .gong-indicator {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 48px;
+        }
+
+        .direction-f .gong-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e2e8f0;
+        }
+
+        .direction-f .gong-dot.active {
+            background: var(--accent);
+        }
+
+        .direction-f .stop-btn {
+            padding: 14px 32px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>meditation</h1>
+        <p>Design Directions - Explorez les variations visuelles</p>
+    </header>
+
+    <main class="directions-grid">
+        <!-- Direction A: Centered Minimal -->
+        <div class="direction-card direction-a">
+            <div class="direction-label">
+                <h3>Direction A</h3>
+                <p>Centered Minimal - Timer dominant, configuration en dessous</p>
+            </div>
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="timer-display">20:00</div>
+                    <div class="config-group">
+                        <div class="config-label">Duree</div>
+                        <div class="config-value">20 minutes</div>
+                    </div>
+                    <div class="config-group">
+                        <div class="config-label">Intervalle</div>
+                        <div class="config-value">5 minutes</div>
+                    </div>
+                    <button class="start-btn">Commencer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction B: Card-based -->
+        <div class="direction-card direction-b">
+            <div class="direction-label">
+                <h3>Direction B</h3>
+                <p>Card-based - Configuration en cartes distinctes</p>
+            </div>
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="timer-section">
+                        <div class="timer-display">20:00</div>
+                        <div class="timer-label">Session</div>
+                    </div>
+                    <div class="config-cards">
+                        <div class="config-card">
+                            <div class="card-label">Duree</div>
+                            <div class="card-value">20</div>
+                            <div class="card-unit">min</div>
+                        </div>
+                        <div class="config-card">
+                            <div class="card-label">Gong</div>
+                            <div class="card-value">5</div>
+                            <div class="card-unit">min</div>
+                        </div>
+                    </div>
+                    <button class="start-btn">Commencer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction C: Circular Focus -->
+        <div class="direction-card direction-c">
+            <div class="direction-label">
+                <h3>Direction C</h3>
+                <p>Circular Focus - Timer dans un cercle, bouton Start rond</p>
+            </div>
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="circle-timer">
+                        <div class="timer-display">20:00</div>
+                        <div class="timer-label">minutes</div>
+                    </div>
+                    <div class="config-row">
+                        <div class="config-item">
+                            <div class="config-label">Duree</div>
+                            <div class="config-value">20 min</div>
+                        </div>
+                        <div class="config-item">
+                            <div class="config-label">Gong</div>
+                            <div class="config-value">5 min</div>
+                        </div>
+                    </div>
+                    <button class="start-btn">Start</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction D: Stepper Controls -->
+        <div class="direction-card direction-d">
+            <div class="direction-label">
+                <h3>Direction D</h3>
+                <p>Stepper Controls - Boutons +/- pour ajuster les valeurs</p>
+            </div>
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="timer-section">
+                        <div class="timer-display">20:00</div>
+                    </div>
+                    <div class="config-section">
+                        <div class="stepper-row">
+                            <span class="stepper-label">Duree</span>
+                            <div class="stepper-controls">
+                                <button class="stepper-btn">-</button>
+                                <span class="stepper-value">20 min</span>
+                                <button class="stepper-btn">+</button>
+                            </div>
+                        </div>
+                        <div class="stepper-row">
+                            <span class="stepper-label">Intervalle</span>
+                            <div class="stepper-controls">
+                                <button class="stepper-btn">-</button>
+                                <span class="stepper-value">5 min</span>
+                                <button class="stepper-btn">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="start-btn">Commencer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction E: Ultra Minimal -->
+        <div class="direction-card direction-e">
+            <div class="direction-label">
+                <h3>Direction E</h3>
+                <p>Ultra Minimal - Absolument essentiel uniquement</p>
+            </div>
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="timer-display">20:00</div>
+                    <div class="config-inline">
+                        <span>20 min</span> / gong <span>5 min</span>
+                    </div>
+                    <button class="start-btn">Start</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction F: Session View -->
+        <div class="direction-card direction-f">
+            <div class="direction-label">
+                <h3>Direction F</h3>
+                <p>Session Active - Vue pendant la meditation</p>
+            </div>
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="session-timer">7:23</div>
+                    <div class="session-remaining">12:37 restantes</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="gong-indicator">
+                        <div class="gong-dot active"></div>
+                        <div class="gong-dot"></div>
+                        <div class="gong-dot"></div>
+                        <div class="gong-dot"></div>
+                    </div>
+                    <button class="stop-btn">Arreter</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>meditation - UX Design Specification</p>
+        <p>Choisissez la direction qui resonne le plus avec votre vision.</p>
+    </footer>
+</body>
+</html>
