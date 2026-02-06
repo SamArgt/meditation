@@ -46,7 +46,7 @@ development_status:
   1-2-interface-de-configuration: review
   1-3-affichage-timer-controles: review
   1-4-logique-timer-gestion-session: review
-  1-5-persistance-des-reglages: backlog
+  1-5-persistance-des-reglages: review
   1-6-indicateurs-de-gongs-polish: backlog
   epic-1-retrospective: optional
 

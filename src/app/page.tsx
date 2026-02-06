@@ -12,13 +12,26 @@ import {
   DEFAULT_INTERVAL,
   INTERVAL_OPTIONS,
 } from "@/lib/constants";
+import { loadSettings, saveSettings } from "@/lib/storage";
 
 const SESSION_END_DELAY = 3000;
 
 export default function Home() {
-  const [duration, setDuration] = useState(DEFAULT_DURATION);
-  const [interval, setInterval] = useState(DEFAULT_INTERVAL);
+  const [duration, setDuration] = useState(() => {
+    const saved = loadSettings();
+    return saved?.duration ?? DEFAULT_DURATION;
+  });
+  const [interval, setInterval] = useState(() => {
+    const saved = loadSettings();
+    if (!saved) return DEFAULT_INTERVAL;
+    return Math.min(saved.interval, saved.duration);
+  });
   const [showEndMessage, setShowEndMessage] = useState(false);
+
+  // Auto-save settings on every change
+  useEffect(() => {
+    saveSettings({ duration, interval });
+  }, [duration, interval]);
 
   function handleSessionEnd() {
     setShowEndMessage(true);
