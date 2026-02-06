@@ -1,10 +1,13 @@
 "use client";
 
+import { type RefObject } from "react";
+
 interface CircularProgressProps {
   duration: number;
   elapsedSeconds: number;
   isRunning: boolean;
   isComplete?: boolean;
+  progressRef?: RefObject<SVGCircleElement | null>;
 }
 
 function formatTime(totalSeconds: number): string {
@@ -21,6 +24,7 @@ export default function CircularProgress({
   elapsedSeconds,
   isRunning,
   isComplete = false,
+  progressRef,
 }: CircularProgressProps) {
   const totalSeconds = duration * 60;
   const progress = isComplete ? 1 : isRunning ? elapsedSeconds / totalSeconds : 0;
@@ -51,6 +55,7 @@ export default function CircularProgress({
         />
         {/* Progress circle */}
         <circle
+          ref={progressRef}
           cx="100"
           cy="100"
           r={RADIUS}
@@ -61,7 +66,7 @@ export default function CircularProgress({
           strokeDasharray={CIRCUMFERENCE}
           strokeDashoffset={offset}
           transform="rotate(-90 100 100)"
-          className="transition-[stroke-dashoffset] duration-1000 ease-linear motion-reduce:transition-none"
+          className="transition-all duration-300 ease-linear motion-reduce:transition-[stroke-dashoffset]"
         />
         {/* Time display */}
         <text

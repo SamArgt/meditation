@@ -36,16 +36,67 @@ export default function Home() {
   }, [duration, interval]);
 
   function handleSessionEnd() {
+    audio.playEndGong();
     setShowEndMessage(true);
   }
 
   const timer = useTimer({ duration, onComplete: handleSessionEnd });
   const audio = useAudio();
   const timerResetRef = useRef(timer.reset);
+  const lastGongIndexRef = useRef(-1);
+  const progressRef = useRef<SVGCircleElement>(null);
+
+  const totalGongs =
+    duration % interval === 0
+      ? duration / interval - 1
+      : Math.floor(duration / interval);
+
+  const completedGongs = Math.min(
+    Math.floor(timer.elapsedTime / (interval * 60)),
+    totalGongs,
+  );
+
+  const isActive = timer.isRunning || showEndMessage;
+
+  const audioUnavailable =
+    audio.error !== null && !audio.isReady && timer.isRunning;
 
   useEffect(() => {
     timerResetRef.current = timer.reset;
   }, [timer.reset]);
+
+  // Interval gong triggering
+  useEffect(() => {
+    if (!timer.isRunning) return;
+
+    const intervalSeconds = interval * 60;
+    const durationSeconds = duration * 60;
+
+    // Anti-double-gong: don't trigger interval gong at session end
+    if (timer.elapsedTime >= durationSeconds) return;
+
+    const currentGongIndex = Math.floor(timer.elapsedTime / intervalSeconds);
+
+    if (
+      currentGongIndex > lastGongIndexRef.current &&
+      currentGongIndex > 0 &&
+      currentGongIndex <= totalGongs
+    ) {
+      if (audio.isReady) {
+        audio.playIntervalGong();
+      } else if (audio.error !== null && progressRef.current) {
+        // Visual flash fallback — imperative DOM manipulation (no setState)
+        const circle = progressRef.current;
+        circle.setAttribute("stroke-width", "6");
+        circle.style.opacity = "0.7";
+        setTimeout(() => {
+          circle.setAttribute("stroke-width", "4");
+          circle.style.opacity = "1";
+        }, 500);
+      }
+      lastGongIndexRef.current = currentGongIndex;
+    }
+  }, [timer.elapsedTime, timer.isRunning, interval, duration, audio, totalGongs]);
 
   // Auto-return to rest after 3 seconds when session ends
   useEffect(() => {
@@ -54,10 +105,11 @@ export default function Home() {
     const id = window.setTimeout(() => {
       timerResetRef.current();
       setShowEndMessage(false);
+      audio.cleanup();
     }, SESSION_END_DELAY);
 
     return () => window.clearTimeout(id);
-  }, [showEndMessage]);
+  }, [showEndMessage, audio]);
 
   function handleDurationChange(newDuration: number) {
     setDuration(newDuration);
@@ -74,27 +126,17 @@ export default function Home() {
   }
 
   async function handleStart() {
+    lastGongIndexRef.current = -1;
     await audio.init();
     timer.start();
   }
 
   function handleStop() {
+    lastGongIndexRef.current = -1;
     timer.stop();
     timer.reset();
     audio.cleanup();
   }
-
-  const isActive = timer.isRunning || showEndMessage;
-
-  const totalGongs =
-    duration % interval === 0
-      ? duration / interval - 1
-      : Math.floor(duration / interval);
-
-  const completedGongs = Math.min(
-    Math.floor(timer.elapsedTime / (interval * 60)),
-    totalGongs,
-  );
 
   return (
     <div className="flex min-h-svh items-center justify-center bg-background px-6">
@@ -104,6 +146,7 @@ export default function Home() {
           elapsedSeconds={timer.elapsedTime}
           isRunning={timer.isRunning}
           isComplete={timer.isComplete}
+          progressRef={progressRef}
         />
 
         {timer.isRunning && (
@@ -111,6 +154,12 @@ export default function Home() {
             totalGongs={totalGongs}
             completedGongs={completedGongs}
           />
+        )}
+
+        {audioUnavailable && (
+          <p className="text-center text-sm text-text-secondary">
+            Son indisponible
+          </p>
         )}
 
         {showEndMessage && (
