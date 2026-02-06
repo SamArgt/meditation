@@ -16,6 +16,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Meditation",
   description: "Timer de méditation minimaliste avec gongs de bol tibétain",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Meditation",
+  },
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {

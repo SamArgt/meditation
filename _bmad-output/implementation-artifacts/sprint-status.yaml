@@ -57,7 +57,7 @@ development_status:
   epic-2-retrospective: optional
 
   # Epic 3: PWA Installable & Offline
-  epic-3: backlog
-  3-1-configuration-pwa-installation: backlog
+  epic-3: in-progress
+  3-1-configuration-pwa-installation: review
   3-2-offline-strategie-de-cache: backlog
   epic-3-retrospective: optional
