@@ -9,6 +9,7 @@ import StopButton from "@/components/StopButton";
 import GongIndicators from "@/components/GongIndicators";
 import useTimer from "@/hooks/useTimer";
 import useAudio from "@/hooks/useAudio";
+import useWakeLock from "@/hooks/useWakeLock";
 import {
   DEFAULT_DURATION,
   DEFAULT_INTERVAL,
@@ -42,6 +43,7 @@ export default function Home() {
 
   const timer = useTimer({ duration, onComplete: handleSessionEnd });
   const audio = useAudio();
+  const wakeLock = useWakeLock();
   const timerResetRef = useRef(timer.reset);
   const lastGongIndexRef = useRef(-1);
   const progressRef = useRef<SVGCircleElement>(null);
@@ -106,10 +108,11 @@ export default function Home() {
       timerResetRef.current();
       setShowEndMessage(false);
       audio.cleanup();
+      wakeLock.release();
     }, SESSION_END_DELAY);
 
     return () => window.clearTimeout(id);
-  }, [showEndMessage, audio]);
+  }, [showEndMessage, audio, wakeLock]);
 
   function handleDurationChange(newDuration: number) {
     setDuration(newDuration);
@@ -129,6 +132,7 @@ export default function Home() {
     lastGongIndexRef.current = -1;
     await audio.init();
     timer.start();
+    wakeLock.request();
   }
 
   function handleStop() {
@@ -136,6 +140,7 @@ export default function Home() {
     timer.stop();
     timer.reset();
     audio.cleanup();
+    wakeLock.release();
   }
 
   return (
