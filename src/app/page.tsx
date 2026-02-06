@@ -8,6 +8,7 @@ import StartButton from "@/components/StartButton";
 import StopButton from "@/components/StopButton";
 import GongIndicators from "@/components/GongIndicators";
 import useTimer from "@/hooks/useTimer";
+import useAudio from "@/hooks/useAudio";
 import {
   DEFAULT_DURATION,
   DEFAULT_INTERVAL,
@@ -39,6 +40,7 @@ export default function Home() {
   }
 
   const timer = useTimer({ duration, onComplete: handleSessionEnd });
+  const audio = useAudio();
   const timerResetRef = useRef(timer.reset);
 
   useEffect(() => {
@@ -71,13 +73,15 @@ export default function Home() {
     }
   }
 
-  function handleStart() {
+  async function handleStart() {
+    await audio.init();
     timer.start();
   }
 
   function handleStop() {
     timer.stop();
     timer.reset();
+    audio.cleanup();
   }
 
   const isActive = timer.isRunning || showEndMessage;
