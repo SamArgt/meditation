@@ -4,6 +4,7 @@ interface CircularProgressProps {
   duration: number;
   elapsedSeconds: number;
   isRunning: boolean;
+  isComplete?: boolean;
 }
 
 function formatTime(totalSeconds: number): string {
@@ -19,14 +20,17 @@ export default function CircularProgress({
   duration,
   elapsedSeconds,
   isRunning,
+  isComplete = false,
 }: CircularProgressProps) {
   const totalSeconds = duration * 60;
-  const progress = isRunning ? elapsedSeconds / totalSeconds : 0;
+  const progress = isComplete ? 1 : isRunning ? elapsedSeconds / totalSeconds : 0;
   const offset = CIRCUMFERENCE * (1 - progress);
 
-  const displayTime = isRunning
-    ? formatTime(elapsedSeconds)
-    : formatTime(totalSeconds);
+  const displayTime = isComplete
+    ? formatTime(totalSeconds)
+    : isRunning
+      ? formatTime(elapsedSeconds)
+      : formatTime(totalSeconds);
 
   return (
     <div className="flex items-center justify-center">

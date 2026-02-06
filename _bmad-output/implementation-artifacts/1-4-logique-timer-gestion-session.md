@@ -1,6 +1,6 @@
 # Story 1.4: Logique Timer & Gestion Session
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -24,39 +24,39 @@ Afin de méditer en confiance sans surveiller le temps.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Créer le hook `useTimer` (AC: #4, #5)
-  - [ ] 1.1: Créer `src/hooks/useTimer.ts` respectant le pattern de retour standardisé Architecture (data, actions, status)
-  - [ ] 1.2: Interface de retour : `{ elapsedTime: number; isRunning: boolean; isComplete: boolean; start: () => void; stop: () => void; reset: () => void; }`
-  - [ ] 1.3: Utiliser `performance.now()` comme source de timing pour éviter la dérive de `setInterval` — stocker `startTimeRef` via `useRef`
-  - [ ] 1.4: Boucle de mise à jour via `requestAnimationFrame` : calculer `elapsed = performance.now() - startTimeRef`, mettre à jour `elapsedTime` à chaque seconde (floor du elapsed en secondes)
-  - [ ] 1.5: Paramètre `duration` (en minutes) — le hook compare `elapsedTime >= duration * 60` pour déclencher la fin automatique
-  - [ ] 1.6: Quand la session se termine automatiquement : mettre `isRunning=false`, `isComplete=true`, appeler le callback `onComplete()` (optionnel)
-  - [ ] 1.7: Cleanup du `requestAnimationFrame` dans le return du `useEffect` et lors de `stop()`/`reset()`
-  - [ ] 1.8: Gérer le retour de l'onglet en arrière-plan via Page Visibility API — recalculer le temps écoulé réel au retour au premier plan
+- [x] Task 1: Créer le hook `useTimer` (AC: #4, #5)
+  - [x] 1.1: Créer `src/hooks/useTimer.ts` respectant le pattern de retour standardisé Architecture (data, actions, status)
+  - [x] 1.2: Interface de retour : `{ elapsedTime: number; isRunning: boolean; isComplete: boolean; start: () => void; stop: () => void; reset: () => void; }`
+  - [x] 1.3: Utiliser `performance.now()` comme source de timing pour éviter la dérive de `setInterval` — stocker `startTimeRef` via `useRef`
+  - [x] 1.4: Boucle de mise à jour via `requestAnimationFrame` : calculer `elapsed = performance.now() - startTimeRef`, mettre à jour `elapsedTime` à chaque seconde (floor du elapsed en secondes)
+  - [x] 1.5: Paramètre `duration` (en minutes) — le hook compare `elapsedTime >= duration * 60` pour déclencher la fin automatique
+  - [x] 1.6: Quand la session se termine automatiquement : mettre `isRunning=false`, `isComplete=true`, appeler le callback `onComplete()` (optionnel)
+  - [x] 1.7: Cleanup du `requestAnimationFrame` dans le return du `useEffect` et lors de `stop()`/`reset()`
+  - [x] 1.8: Gérer le retour de l'onglet en arrière-plan via Page Visibility API — recalculer le temps écoulé réel au retour au premier plan
 
-- [ ] Task 2: Intégrer useTimer dans page.tsx (AC: #1, #2, #3)
-  - [ ] 2.1: Remplacer le timer basique (useState + useEffect + setInterval) par un appel à `useTimer({ duration, onComplete: handleSessionEnd })`
-  - [ ] 2.2: Supprimer les `useState` pour `isRunning` et `elapsedSeconds` — ces états viennent maintenant de useTimer
-  - [ ] 2.3: Adapter `handleStart()` → appeler `timer.start()`, `handleStop()` → appeler `timer.stop()` puis `timer.reset()`
-  - [ ] 2.4: Passer `timer.elapsedTime` (en secondes entières) à `CircularProgress` via la prop `elapsedSeconds`
-  - [ ] 2.5: Passer `timer.isRunning` à `CircularProgress` et pour le rendu conditionnel Start/Stop + sélecteurs
+- [x] Task 2: Intégrer useTimer dans page.tsx (AC: #1, #2, #3)
+  - [x] 2.1: Remplacer le timer basique (useState + useEffect + setInterval) par un appel à `useTimer({ duration, onComplete: handleSessionEnd })`
+  - [x] 2.2: Supprimer les `useState` pour `isRunning` et `elapsedSeconds` — ces états viennent maintenant de useTimer
+  - [x] 2.3: Adapter `handleStart()` → appeler `timer.start()`, `handleStop()` → appeler `timer.stop()` puis `timer.reset()`
+  - [x] 2.4: Passer `timer.elapsedTime` (en secondes entières) à `CircularProgress` via la prop `elapsedSeconds`
+  - [x] 2.5: Passer `timer.isRunning` à `CircularProgress` et pour le rendu conditionnel Start/Stop + sélecteurs
 
-- [ ] Task 3: Implémenter la fin automatique de session (AC: #2, #3)
-  - [ ] 3.1: Créer `handleSessionEnd()` dans page.tsx — appelée par le callback `onComplete` de useTimer
-  - [ ] 3.2: Quand la session se termine : afficher un état "terminé" (le cercle est complètement vidé, le timer affiche la durée totale ex: "20:00")
-  - [ ] 3.3: Après 3 secondes (setTimeout), appeler `timer.reset()` pour retourner automatiquement à l'écran principal (mode repos)
-  - [ ] 3.4: Pendant les 3 secondes de fin, afficher un feedback visuel clair (ex: texte "Session terminée" sous le cercle, fade subtil)
-  - [ ] 3.5: Pendant les 3 secondes de fin, NE PAS afficher les sélecteurs ni le bouton Start — seulement le cercle et le message
+- [x] Task 3: Implémenter la fin automatique de session (AC: #2, #3)
+  - [x] 3.1: Créer `handleSessionEnd()` dans page.tsx — appelée par le callback `onComplete` de useTimer
+  - [x] 3.2: Quand la session se termine : afficher un état "terminé" (le cercle est complètement vidé, le timer affiche la durée totale ex: "20:00")
+  - [x] 3.3: Après 3 secondes (setTimeout), appeler `timer.reset()` pour retourner automatiquement à l'écran principal (mode repos)
+  - [x] 3.4: Pendant les 3 secondes de fin, afficher un feedback visuel clair (ex: texte "Session terminée" sous le cercle, fade subtil)
+  - [x] 3.5: Pendant les 3 secondes de fin, NE PAS afficher les sélecteurs ni le bouton Start — seulement le cercle et le message
 
-- [ ] Task 4: Mettre à jour CircularProgress pour les nouveaux états (AC: #1, #2, #3)
-  - [ ] 4.1: Ajouter une prop optionnelle `isComplete` (boolean) à CircularProgress
-  - [ ] 4.2: En mode `isComplete=true` : cercle complètement vidé (progress=1), afficher la durée totale (pas elapsedSeconds)
-  - [ ] 4.3: Vérifier que la transition du cercle reste fluide avec le nouveau hook basé sur requestAnimationFrame (la transition CSS `duration-1000 ease-linear` sur stroke-dashoffset devrait toujours fonctionner car la mise à jour est chaque seconde)
+- [x] Task 4: Mettre à jour CircularProgress pour les nouveaux états (AC: #1, #2, #3)
+  - [x] 4.1: Ajouter une prop optionnelle `isComplete` (boolean) à CircularProgress
+  - [x] 4.2: En mode `isComplete=true` : cercle complètement vidé (progress=1), afficher la durée totale (pas elapsedSeconds)
+  - [x] 4.3: Vérifier que la transition du cercle reste fluide avec le nouveau hook basé sur requestAnimationFrame (la transition CSS `duration-1000 ease-linear` sur stroke-dashoffset devrait toujours fonctionner car la mise à jour est chaque seconde)
 
-- [ ] Task 5: Vérification build + lint (AC: all)
-  - [ ] 5.1: `npm run build` sans erreurs
-  - [ ] 5.2: `npm run lint` sans erreurs
-  - [ ] 5.3: Vérifier manuellement : session démarre, temps s'incrémente, cercle se vide, session se termine automatiquement à la durée configurée, retour au repos après 3s
+- [x] Task 5: Vérification build + lint (AC: all)
+  - [x] 5.1: `npm run build` sans erreurs
+  - [x] 5.2: `npm run lint` sans erreurs
+  - [x] 5.3: Vérifier manuellement : session démarre, temps s'incrémente, cercle se vide, session se termine automatiquement à la durée configurée, retour au repos après 3s
 
 ## Dev Notes
 
@@ -316,10 +316,30 @@ const timer = useTimer({ duration, onComplete: handleSessionEnd });
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.6
 
 ### Debug Log References
 
+- Build successful: Next.js 16.1.6 (Turbopack), compiled in 1410.7ms
+- Lint: 0 errors, 0 warnings
+- TypeScript: no errors
+- React 19 strict lint: resolved 3 refs-during-render errors by moving ref updates into useEffect
+
 ### Completion Notes List
 
+- Hook useTimer créé dans `src/hooks/useTimer.ts` — premier custom hook de l'application, respecte le pattern de retour standardisé Architecture (data: elapsedTime, status: isRunning/isComplete, actions: start/stop/reset)
+- Timing via `performance.now()` + `requestAnimationFrame` au lieu de setInterval — élimine la dérive temporelle, précision sub-milliseconde garantie
+- Page Visibility API intégrée : écoute `visibilitychange`, force un tick immédiat au retour au premier plan pour recalculer le temps écoulé correct même après mise en arrière-plan
+- Fin automatique : quand `elapsedSeconds >= durationSeconds`, le hook passe `isComplete=true`, arrête le RAF, et appelle `onComplete?.()`
+- page.tsx refactoré : supprimé le timer basique (useState isRunning/elapsedSeconds + useEffect setInterval), remplacé par `useTimer({ duration, onComplete: handleSessionEnd })`
+- État de fin de session : `showEndMessage` contrôle l'affichage du message "Session terminée" avec `aria-live="polite"`, retour auto après 3s via setTimeout
+- Pendant la fin : sélecteurs et bouton Start masqués, seul le cercle complet et le message sont visibles
+- CircularProgress mis à jour : nouvelle prop `isComplete` (optionnelle), quand true le cercle affiche progress=1 et la durée totale
+- React 19 compliance : les mises à jour de refs (onCompleteRef, durationSecondsRef, timerResetRef) sont dans des useEffect au lieu de pendant le render
+- Conventions Architecture respectées : PascalCase interfaces, camelCase fonctions/variables, SCREAMING_SNAKE_CASE constante SESSION_END_DELAY, imports via @/*
+
 ### File List
+
+- src/hooks/useTimer.ts (nouveau)
+- src/app/page.tsx (modifié)
+- src/components/CircularProgress.tsx (modifié)
