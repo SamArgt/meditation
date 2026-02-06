@@ -1,6 +1,6 @@
 # Story 1.2: Interface de Configuration
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -22,32 +22,32 @@ Afin de personnaliser ma méditation selon mes besoins.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Créer le composant DurationSelector (AC: #1, #2)
-  - [ ] 1.1: Créer `src/components/DurationSelector.tsx` avec les options prédéfinies [5, 10, 15, 20, 30, 45, 60] depuis `constants.ts`
-  - [ ] 1.2: Implémenter l'interaction de sélection (tap sur une valeur pour la sélectionner)
-  - [ ] 1.3: Afficher la valeur sélectionnée clairement (état actif avec couleur accent)
-  - [ ] 1.4: Ajouter le label "Durée" au-dessus du sélecteur (police sans-serif, text-secondary)
-  - [ ] 1.5: Assurer les touch targets minimum 48x48px et le feedback visuel immédiat au tap
+- [x] Task 1: Créer le composant DurationSelector (AC: #1, #2)
+  - [x] 1.1: Créer `src/components/DurationSelector.tsx` avec les options prédéfinies [5, 10, 15, 20, 30, 45, 60] depuis `constants.ts`
+  - [x] 1.2: Implémenter l'interaction de sélection (tap sur une valeur pour la sélectionner)
+  - [x] 1.3: Afficher la valeur sélectionnée clairement (état actif avec couleur accent)
+  - [x] 1.4: Ajouter le label "Durée" au-dessus du sélecteur (police sans-serif, text-secondary)
+  - [x] 1.5: Assurer les touch targets minimum 48x48px et le feedback visuel immédiat au tap
 
-- [ ] Task 2: Créer le composant IntervalSelector (AC: #1, #3)
-  - [ ] 2.1: Créer `src/components/IntervalSelector.tsx` avec les options prédéfinies [1, 2, 3, 5, 10] depuis `constants.ts`
-  - [ ] 2.2: Implémenter l'interaction de sélection (même pattern que DurationSelector)
-  - [ ] 2.3: Afficher la valeur sélectionnée clairement (état actif avec couleur accent)
-  - [ ] 2.4: Ajouter le label "Intervalle" au-dessus du sélecteur
-  - [ ] 2.5: Assurer les touch targets minimum 48x48px
+- [x] Task 2: Créer le composant IntervalSelector (AC: #1, #3)
+  - [x] 2.1: Créer `src/components/IntervalSelector.tsx` avec les options prédéfinies [1, 2, 3, 5, 10] depuis `constants.ts`
+  - [x] 2.2: Implémenter l'interaction de sélection (même pattern que DurationSelector)
+  - [x] 2.3: Afficher la valeur sélectionnée clairement (état actif avec couleur accent)
+  - [x] 2.4: Ajouter le label "Intervalle" au-dessus du sélecteur
+  - [x] 2.5: Assurer les touch targets minimum 48x48px
 
-- [ ] Task 3: Implémenter la logique de validation croisée (AC: #3, #4)
-  - [ ] 3.1: Valider que l'intervalle ne dépasse jamais la durée totale sélectionnée
-  - [ ] 3.2: Si la durée est modifiée à une valeur inférieure à l'intervalle actuel, ajuster automatiquement l'intervalle au plus grand choix possible ≤ nouvelle durée
-  - [ ] 3.3: Filtrer visuellement les options d'intervalle indisponibles (griser ou masquer celles > durée)
+- [x] Task 3: Implémenter la logique de validation croisée (AC: #3, #4)
+  - [x] 3.1: Valider que l'intervalle ne dépasse jamais la durée totale sélectionnée
+  - [x] 3.2: Si la durée est modifiée à une valeur inférieure à l'intervalle actuel, ajuster automatiquement l'intervalle au plus grand choix possible ≤ nouvelle durée
+  - [x] 3.3: Filtrer visuellement les options d'intervalle indisponibles (griser ou masquer celles > durée)
 
-- [ ] Task 4: Intégrer les sélecteurs dans page.tsx (AC: #1, #4)
-  - [ ] 4.1: Ajouter l'état `duration` et `interval` avec useState dans `page.tsx` (valeurs par défaut depuis constants.ts)
-  - [ ] 4.2: Importer et placer DurationSelector et IntervalSelector sous le titre, côte à côte ou empilés selon le layout UX
-  - [ ] 4.3: Connecter les callbacks onChange pour mise à jour immédiate de l'état
-  - [ ] 4.4: Passer la durée sélectionnée à IntervalSelector pour la validation croisée
-  - [ ] 4.5: Vérifier le layout responsive (mobile: empilé, tablet+: côte à côte possible)
-  - [ ] 4.6: Vérifier que le layout respecte la hiérarchie visuelle UX : Timer (futur) > Config > Start (futur)
+- [x] Task 4: Intégrer les sélecteurs dans page.tsx (AC: #1, #4)
+  - [x] 4.1: Ajouter l'état `duration` et `interval` avec useState dans `page.tsx` (valeurs par défaut depuis constants.ts)
+  - [x] 4.2: Importer et placer DurationSelector et IntervalSelector sous le titre, côte à côte ou empilés selon le layout UX
+  - [x] 4.3: Connecter les callbacks onChange pour mise à jour immédiate de l'état
+  - [x] 4.4: Passer la durée sélectionnée à IntervalSelector pour la validation croisée
+  - [x] 4.5: Vérifier le layout responsive (mobile: empilé, tablet+: côte à côte possible)
+  - [x] 4.6: Vérifier que le layout respecte la hiérarchie visuelle UX : Timer (futur) > Config > Start (futur)
 
 ## Dev Notes
 
@@ -217,10 +217,25 @@ export const INTERVAL_OPTIONS = [1, 2, 3, 5, 10] as const;
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.6
 
 ### Debug Log References
 
+- Build successful: Next.js 16.1.6 (Turbopack), compiled in 1316.8ms
+- Lint: no errors
+- TypeScript: no errors
+
 ### Completion Notes List
 
+- DurationSelector créé : composant pur avec boutons pilule (rounded-full), options depuis DURATION_OPTIONS, état actif bg-accent + text-white, touch targets 48x48px min, transition-colors 150ms
+- IntervalSelector créé : même pattern visuel, prop `maxInterval` pour validation croisée, options > maxInterval désactivées (opacity-40, cursor-not-allowed)
+- Validation croisée dans page.tsx : handleDurationChange ajuste automatiquement l'intervalle au plus grand choix valide si la durée diminue en dessous de l'intervalle actuel
+- page.tsx converti en Client Component ('use client') avec useState pour duration et interval
+- Layout empilé verticalement (flex-col gap-8), sélecteurs placés sous le titre dans la hiérarchie visuelle
+- Conventions respectées : PascalCase composants, interface Props typées, design tokens Tailwind, imports via alias @/*
+
 ### File List
+
+- src/components/DurationSelector.tsx (nouveau)
+- src/components/IntervalSelector.tsx (nouveau)
+- src/app/page.tsx (modifié)
