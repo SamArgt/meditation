@@ -6,6 +6,7 @@ import DurationSelector from "@/components/DurationSelector";
 import IntervalSelector from "@/components/IntervalSelector";
 import StartButton from "@/components/StartButton";
 import StopButton from "@/components/StopButton";
+import GongIndicators from "@/components/GongIndicators";
 import useTimer from "@/hooks/useTimer";
 import {
   DEFAULT_DURATION,
@@ -81,6 +82,16 @@ export default function Home() {
 
   const isActive = timer.isRunning || showEndMessage;
 
+  const totalGongs =
+    duration % interval === 0
+      ? duration / interval - 1
+      : Math.floor(duration / interval);
+
+  const completedGongs = Math.min(
+    Math.floor(timer.elapsedTime / (interval * 60)),
+    totalGongs,
+  );
+
   return (
     <div className="flex min-h-svh items-center justify-center bg-background px-6">
       <main className="flex w-full max-w-[480px] flex-col items-center gap-8">
@@ -90,6 +101,13 @@ export default function Home() {
           isRunning={timer.isRunning}
           isComplete={timer.isComplete}
         />
+
+        {timer.isRunning && (
+          <GongIndicators
+            totalGongs={totalGongs}
+            completedGongs={completedGongs}
+          />
+        )}
 
         {showEndMessage && (
           <p
