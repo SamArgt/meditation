@@ -2,6 +2,7 @@
 
 A minimalist meditation timer PWA with Tibetan bowl gong sounds.
 
+
 ## Features
 
 - Configurable session duration (5-60 minutes)
