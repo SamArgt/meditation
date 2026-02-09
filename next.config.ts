@@ -7,5 +7,6 @@ const withSerwist = withSerwistInit({
 });
 
 export default withSerwist({
+  output: "standalone",
   turbopack: {},
 });
