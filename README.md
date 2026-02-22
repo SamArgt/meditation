@@ -40,6 +40,8 @@ npm run build
 npm run start
 ```
 
+Important: offline mode only works in production (service worker is disabled in `npm run dev`).
+
 ## Linting
 
 ```bash
