@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import CircularProgress from "@/components/CircularProgress";
+import PreStartDial from "@/components/PreStartDial";
 import DurationSelector from "@/components/DurationSelector";
 import IntervalSelector from "@/components/IntervalSelector";
 import StartButton from "@/components/StartButton";
@@ -18,6 +19,7 @@ import {
 import { loadSettings, saveSettings } from "@/lib/storage";
 
 const SESSION_END_DELAY = 3000;
+const PREP_COUNTDOWN_SECONDS = 5;
 
 export default function Home() {
   const [duration, setDuration] = useState(() => {
@@ -30,6 +32,7 @@ export default function Home() {
     return Math.min(saved.interval, saved.duration);
   });
   const [showEndMessage, setShowEndMessage] = useState(false);
+  const [prepCountdown, setPrepCountdown] = useState<number | null>(null);
 
   // Auto-save settings on every change
   useEffect(() => {
@@ -45,6 +48,8 @@ export default function Home() {
   const audio = useAudio();
   const wakeLock = useWakeLock();
   const timerResetRef = useRef(timer.reset);
+  const timerStartRef = useRef(timer.start);
+  const playStartGongRef = useRef(audio.playIntervalGong);
   const lastGongIndexRef = useRef(-1);
   const progressRef = useRef<SVGCircleElement>(null);
 
@@ -58,14 +63,41 @@ export default function Home() {
     totalGongs,
   );
 
-  const isActive = timer.isRunning || showEndMessage;
+  const isPreparing = prepCountdown !== null;
+  const isActive = timer.isRunning || showEndMessage || isPreparing;
 
   const audioUnavailable =
-    audio.error !== null && !audio.isReady && timer.isRunning;
+    audio.error !== null && !audio.isReady && (timer.isRunning || isPreparing);
+
+  useEffect(() => {
+    if (prepCountdown === null) return;
+
+    const id = window.setTimeout(() => {
+      setPrepCountdown((prev) => {
+        if (prev === null) return prev;
+        if (prev <= 1) {
+          timerStartRef.current();
+          playStartGongRef.current();
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => window.clearTimeout(id);
+  }, [prepCountdown]);
 
   useEffect(() => {
     timerResetRef.current = timer.reset;
   }, [timer.reset]);
+
+  useEffect(() => {
+    timerStartRef.current = timer.start;
+  }, [timer.start]);
+
+  useEffect(() => {
+    playStartGongRef.current = audio.playIntervalGong;
+  }, [audio.playIntervalGong]);
 
   // Interval gong triggering
   useEffect(() => {
@@ -131,12 +163,13 @@ export default function Home() {
   async function handleStart() {
     lastGongIndexRef.current = -1;
     await audio.init();
-    timer.start();
     wakeLock.request();
+    setPrepCountdown(PREP_COUNTDOWN_SECONDS);
   }
 
   function handleStop() {
     lastGongIndexRef.current = -1;
+    setPrepCountdown(null);
     timer.stop();
     timer.reset();
     audio.cleanup();
@@ -146,13 +179,22 @@ export default function Home() {
   return (
     <div className="flex min-h-svh items-center justify-center bg-background px-6">
       <main className="flex w-full max-w-[480px] flex-col items-center gap-8">
-        <CircularProgress
-          duration={duration}
-          elapsedSeconds={timer.elapsedTime}
-          isRunning={timer.isRunning}
-          isComplete={timer.isComplete}
-          progressRef={progressRef}
-        />
+        {isActive ? (
+          <CircularProgress
+            duration={duration}
+            elapsedSeconds={timer.elapsedTime}
+            isRunning={timer.isRunning}
+            isComplete={timer.isComplete}
+            progressRef={progressRef}
+            prepSeconds={prepCountdown}
+          />
+        ) : (
+          <PreStartDial duration={duration} interval={interval} />
+        )}
+
+        {isPreparing && (
+          <p className="text-center text-sm text-text-secondary">Préparation…</p>
+        )}
 
         {timer.isRunning && (
           <GongIndicators
@@ -191,7 +233,7 @@ export default function Home() {
         )}
 
         {!showEndMessage &&
-          (timer.isRunning ? (
+          (timer.isRunning || isPreparing ? (
             <StopButton onClick={handleStop} />
           ) : (
             <StartButton onClick={handleStart} />

@@ -8,6 +8,7 @@ interface CircularProgressProps {
   isRunning: boolean;
   isComplete?: boolean;
   progressRef?: RefObject<SVGCircleElement | null>;
+  prepSeconds?: number | null;
 }
 
 function formatTime(totalSeconds: number): string {
@@ -25,16 +26,14 @@ export default function CircularProgress({
   isRunning,
   isComplete = false,
   progressRef,
+  prepSeconds = null,
 }: CircularProgressProps) {
   const totalSeconds = duration * 60;
   const progress = isComplete ? 1 : isRunning ? elapsedSeconds / totalSeconds : 0;
-  const offset = CIRCUMFERENCE * (1 - progress);
+  const offset = CIRCUMFERENCE * progress;
 
-  const displayTime = isComplete
-    ? formatTime(totalSeconds)
-    : isRunning
-      ? formatTime(elapsedSeconds)
-      : formatTime(totalSeconds);
+  const remainingSeconds = Math.max(totalSeconds - elapsedSeconds, 0);
+  const displayTime = prepSeconds !== null ? formatTime(prepSeconds) : formatTime(remainingSeconds);
 
   return (
     <div className="flex items-center justify-center">
@@ -44,7 +43,6 @@ export default function CircularProgress({
         viewBox="0 0 200 200"
         className="max-w-[280px]"
       >
-        {/* Background circle */}
         <circle
           cx="100"
           cy="100"
@@ -53,7 +51,6 @@ export default function CircularProgress({
           stroke="var(--color-surface)"
           strokeWidth="4"
         />
-        {/* Progress circle */}
         <circle
           ref={progressRef}
           cx="100"
@@ -68,7 +65,6 @@ export default function CircularProgress({
           transform="rotate(-90 100 100)"
           className="transition-all duration-300 ease-linear motion-reduce:transition-[stroke-dashoffset]"
         />
-        {/* Time display */}
         <text
           x="100"
           y="100"
