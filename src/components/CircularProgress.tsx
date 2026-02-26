@@ -30,10 +30,10 @@ export default function CircularProgress({
 }: CircularProgressProps) {
   const totalSeconds = duration * 60;
   const progress = isComplete ? 1 : isRunning ? elapsedSeconds / totalSeconds : 0;
-  const offset = CIRCUMFERENCE * progress;
+  const offset = CIRCUMFERENCE * (1 - progress);
 
-  const remainingSeconds = Math.max(totalSeconds - elapsedSeconds, 0);
-  const displayTime = prepSeconds !== null ? formatTime(prepSeconds) : formatTime(remainingSeconds);
+  const countedSeconds = Math.min(Math.max(elapsedSeconds, 0), totalSeconds);
+  const displayTime = prepSeconds !== null ? formatTime(prepSeconds) : formatTime(countedSeconds);
 
   return (
     <div className="flex items-center justify-center">
