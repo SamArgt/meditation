@@ -1,10 +1,13 @@
 "use client";
 
+import type { PointerEvent } from "react";
 import { DURATION_OPTIONS } from "@/lib/constants";
 
 interface PreStartDialProps {
   duration: number;
   interval: number;
+  onDurationChange: (value: number) => void;
+  onIntervalChange: (value: number) => void;
 }
 
 const RADIUS = 90;
@@ -23,17 +26,67 @@ function dialAngle(minutes: number): number {
   return (minutes / MAX_DURATION) * 360;
 }
 
-export default function PreStartDial({ duration, interval }: PreStartDialProps) {
+function angleFromPoint(x: number, y: number) {
+  const dx = x - CENTER;
+  const dy = y - CENTER;
+  const radians = Math.atan2(dy, dx);
+  return ((radians * 180) / Math.PI + 90 + 360) % 360;
+}
+
+function minuteFromAngle(angle: number): number {
+  const rawMinutes = Math.round((angle / 360) * MAX_DURATION);
+  return Math.min(Math.max(rawMinutes, 1), MAX_DURATION);
+}
+
+export default function PreStartDial({
+  duration,
+  interval,
+  onDurationChange,
+  onIntervalChange,
+}: PreStartDialProps) {
   const intervalMarks = Array.from(
     { length: Math.floor(duration / interval) },
     (_, i) => (i + 1) * interval,
   ).filter((m) => m < duration);
 
   const cursor = polarToCartesian(RADIUS, dialAngle(duration));
+  const intervalCursor = polarToCartesian(RADIUS - 16, dialAngle(interval));
+
+  function handlePointerMove(event: PointerEvent<SVGSVGElement>) {
+    if (!(event.buttons & 1) && event.pointerType !== "touch") return;
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 200;
+    const y = ((event.clientY - rect.top) / rect.height) * 200;
+    const radius = Math.hypot(x - CENTER, y - CENTER);
+    const angle = angleFromPoint(x, y);
+    const minutes = minuteFromAngle(angle);
+
+    // Outer ring controls total duration, inner ring controls interval.
+    if (radius >= RADIUS - 12) {
+      const nearestDuration = DURATION_OPTIONS.reduce((best, option) =>
+        Math.abs(option - minutes) < Math.abs(best - minutes) ? option : best,
+      );
+      onDurationChange(nearestDuration);
+      return;
+    }
+
+    if (radius >= RADIUS - 32) {
+      const safeMinutes = Math.min(minutes, duration);
+      onIntervalChange(Math.max(safeMinutes, 1));
+    }
+  }
 
   return (
     <div className="flex items-center justify-center">
-      <svg width="280" height="280" viewBox="0 0 200 200" className="max-w-[280px]">
+      <svg
+        width="280"
+        height="280"
+        viewBox="0 0 200 200"
+        className="max-w-[280px] touch-none"
+        onPointerDown={handlePointerMove}
+        onPointerMove={handlePointerMove}
+      >
         <circle
           cx={CENTER}
           cy={CENTER}
@@ -81,24 +134,27 @@ export default function PreStartDial({ duration, interval }: PreStartDialProps) 
         })}
 
         <circle cx={cursor.x} cy={cursor.y} r="6" fill="var(--color-accent)" />
+        <circle
+          cx={intervalCursor.x}
+          cy={intervalCursor.y}
+          r="4"
+          fill="var(--color-text-secondary)"
+          opacity="0.85"
+        />
 
         <text
           x={CENTER}
-          y={CENTER - 8}
+          y={CENTER - 4}
           textAnchor="middle"
-          dominantBaseline="central"
-          className="fill-text-primary font-serif text-[42px] font-light"
+          dominantBaseline="middle"
+          className="fill-text-primary font-serif font-light"
         >
-          {duration}
-        </text>
-        <text
-          x={CENTER}
-          y={CENTER + 20}
-          textAnchor="middle"
-          dominantBaseline="central"
-          className="fill-text-secondary text-[14px]"
-        >
-          min • gong / {interval} min
+          <tspan x={CENTER} dy="-9" className="text-[48px]">
+            {duration}
+          </tspan>
+          <tspan x={CENTER} dy="38" className="text-[24px] fill-text-secondary">
+            min
+          </tspan>
         </text>
       </svg>
     </div>

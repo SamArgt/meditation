@@ -32,6 +32,8 @@ export default function useAudio(): UseAudioReturn {
   const audioContextRef = useRef<AudioContext | null>(null);
   const intervalBufferRef = useRef<AudioBuffer | null>(null);
   const endBufferRef = useRef<AudioBuffer | null>(null);
+  const lastIntervalPlayRef = useRef(0);
+  const MIN_INTERVAL_GAP_MS = 300;
 
   const init = useCallback(async () => {
     // Already initialized
@@ -79,6 +81,14 @@ export default function useAudio(): UseAudioReturn {
 
   const playIntervalGong = useCallback(() => {
     if (!audioContextRef.current || !intervalBufferRef.current) return;
+    const now = performance.now();
+
+    // Guard against duplicate triggers on certain mobile browsers.
+    if (now - lastIntervalPlayRef.current < MIN_INTERVAL_GAP_MS) {
+      return;
+    }
+    lastIntervalPlayRef.current = now;
+
     const source = audioContextRef.current.createBufferSource();
     source.buffer = intervalBufferRef.current;
     source.connect(audioContextRef.current.destination);
@@ -100,6 +110,7 @@ export default function useAudio(): UseAudioReturn {
     }
     intervalBufferRef.current = null;
     endBufferRef.current = null;
+    lastIntervalPlayRef.current = 0;
     setIsReady(false);
   }, []);
 
@@ -112,6 +123,7 @@ export default function useAudio(): UseAudioReturn {
       }
       intervalBufferRef.current = null;
       endBufferRef.current = null;
+      lastIntervalPlayRef.current = 0;
     };
   }, []);
 

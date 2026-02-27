@@ -189,7 +189,12 @@ export default function Home() {
             prepSeconds={prepCountdown}
           />
         ) : (
-          <PreStartDial duration={duration} interval={interval} />
+          <PreStartDial
+            duration={duration}
+            interval={interval}
+            onDurationChange={handleDurationChange}
+            onIntervalChange={handleIntervalChange}
+          />
         )}
 
         {isPreparing && (
