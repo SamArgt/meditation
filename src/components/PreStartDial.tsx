@@ -149,10 +149,10 @@ export default function PreStartDial({
           dominantBaseline="middle"
           className="fill-text-primary font-serif font-light"
         >
-          <tspan x={CENTER} dy="-9" className="text-[34px]">
+          <tspan x={CENTER} dy="-9" className="text-[48px]">
             {duration}
           </tspan>
-          <tspan x={CENTER} dy="18" className="text-[16px] fill-text-secondary">
+          <tspan x={CENTER} dy="38" className="text-[24px] fill-text-secondary">
             min
           </tspan>
         </text>
