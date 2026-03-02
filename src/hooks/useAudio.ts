@@ -15,6 +15,7 @@ interface UseAudioReturn {
 
 const INTERVAL_GONG_URL = "/sounds/gong-interval.mp3";
 const END_GONG_URL = "/sounds/gong-end.mp3";
+const AUDIO_DEBUG_PREFIX = "[meditation-audio-debug]";
 
 async function loadBuffer(
   url: string,
@@ -36,8 +37,16 @@ export default function useAudio(): UseAudioReturn {
   const MIN_INTERVAL_GAP_MS = 300;
 
   const init = useCallback(async () => {
+    console.log(`${AUDIO_DEBUG_PREFIX} init called`, {
+      hasAudioContext: Boolean(audioContextRef.current),
+      isReady,
+    });
+
     // Already initialized
-    if (audioContextRef.current && isReady) return;
+    if (audioContextRef.current && isReady) {
+      console.log(`${AUDIO_DEBUG_PREFIX} init skipped (already ready)`);
+      return;
+    }
 
     // Check browser support
     const AudioContextClass =
@@ -46,6 +55,7 @@ export default function useAudio(): UseAudioReturn {
         .webkitAudioContext;
 
     if (!AudioContextClass) {
+      console.log(`${AUDIO_DEBUG_PREFIX} AudioContext not supported`);
       setError("Votre navigateur ne supporte pas l'audio");
       return;
     }
@@ -54,10 +64,14 @@ export default function useAudio(): UseAudioReturn {
       // Create AudioContext lazily (must be in user gesture for mobile)
       if (!audioContextRef.current) {
         audioContextRef.current = new AudioContextClass();
+        console.log(`${AUDIO_DEBUG_PREFIX} AudioContext created`, {
+          state: audioContextRef.current.state,
+        });
       }
 
       // Resume if suspended (iOS Safari autoplay policy)
       if (audioContextRef.current.state === "suspended") {
+        console.log(`${AUDIO_DEBUG_PREFIX} resuming suspended AudioContext`);
         await audioContextRef.current.resume();
       }
 
@@ -71,20 +85,35 @@ export default function useAudio(): UseAudioReturn {
       endBufferRef.current = endBuffer;
       setIsReady(true);
       setError(null);
+      console.log(`${AUDIO_DEBUG_PREFIX} buffers loaded`, {
+        contextState: audioContextRef.current.state,
+      });
     } catch (e) {
       const message =
         e instanceof Error ? e.message : "Erreur de chargement audio";
+      console.log(`${AUDIO_DEBUG_PREFIX} init failed`, { message });
       setError(message);
       setIsReady(false);
     }
   }, [isReady]);
 
   const playIntervalGong = useCallback(() => {
-    if (!audioContextRef.current || !intervalBufferRef.current) return;
+    if (!audioContextRef.current || !intervalBufferRef.current) {
+      console.log(`${AUDIO_DEBUG_PREFIX} interval gong skipped (not ready)`, {
+        hasAudioContext: Boolean(audioContextRef.current),
+        hasIntervalBuffer: Boolean(intervalBufferRef.current),
+      });
+      return;
+    }
     const now = performance.now();
+    const gapMs = now - lastIntervalPlayRef.current;
 
     // Guard against duplicate triggers on certain mobile browsers.
-    if (now - lastIntervalPlayRef.current < MIN_INTERVAL_GAP_MS) {
+    if (gapMs < MIN_INTERVAL_GAP_MS) {
+      console.log(`${AUDIO_DEBUG_PREFIX} interval gong blocked by anti-duplicate guard`, {
+        gapMs,
+        minGapMs: MIN_INTERVAL_GAP_MS,
+      });
       return;
     }
     lastIntervalPlayRef.current = now;
@@ -93,17 +122,34 @@ export default function useAudio(): UseAudioReturn {
     source.buffer = intervalBufferRef.current;
     source.connect(audioContextRef.current.destination);
     source.start(audioContextRef.current.currentTime);
+    console.log(`${AUDIO_DEBUG_PREFIX} interval gong started`, {
+      audioTime: audioContextRef.current.currentTime,
+      perfNow: now,
+    });
   }, []);
 
   const playEndGong = useCallback(() => {
-    if (!audioContextRef.current || !endBufferRef.current) return;
+    if (!audioContextRef.current || !endBufferRef.current) {
+      console.log(`${AUDIO_DEBUG_PREFIX} end gong skipped (not ready)`, {
+        hasAudioContext: Boolean(audioContextRef.current),
+        hasEndBuffer: Boolean(endBufferRef.current),
+      });
+      return;
+    }
     const source = audioContextRef.current.createBufferSource();
     source.buffer = endBufferRef.current;
     source.connect(audioContextRef.current.destination);
     source.start(audioContextRef.current.currentTime);
+    console.log(`${AUDIO_DEBUG_PREFIX} end gong started`, {
+      audioTime: audioContextRef.current.currentTime,
+      perfNow: performance.now(),
+    });
   }, []);
 
   const cleanup = useCallback(() => {
+    console.log(`${AUDIO_DEBUG_PREFIX} cleanup called`, {
+      hasAudioContext: Boolean(audioContextRef.current),
+    });
     if (audioContextRef.current) {
       audioContextRef.current.close();
       audioContextRef.current = null;

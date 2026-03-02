@@ -20,6 +20,7 @@ import { loadSettings, saveSettings } from "@/lib/storage";
 
 const SESSION_END_DELAY = 3000;
 const PREP_COUNTDOWN_SECONDS = 5;
+const TIMER_DEBUG_PREFIX = "[meditation-timer-debug]";
 
 export default function Home() {
   const [duration, setDuration] = useState(() => {
@@ -40,6 +41,11 @@ export default function Home() {
   }, [duration, interval]);
 
   function handleSessionEnd() {
+    console.log(`${TIMER_DEBUG_PREFIX} handleSessionEnd fired`, {
+      elapsedTime: timer.elapsedTime,
+      durationSeconds: duration * 60,
+      lastGongIndex: lastGongIndexRef.current,
+    });
     audio.playEndGong();
     setShowEndMessage(true);
   }
@@ -69,6 +75,31 @@ export default function Home() {
   const audioUnavailable =
     audio.error !== null && !audio.isReady && (timer.isRunning || isPreparing);
 
+  async function handleStart() {
+    console.log(`${TIMER_DEBUG_PREFIX} handleStart clicked`, {
+      duration,
+      interval,
+      totalGongs,
+    });
+    lastGongIndexRef.current = -1;
+    await audio.init();
+    wakeLock.request();
+    setPrepCountdown(PREP_COUNTDOWN_SECONDS);
+  }
+
+  function handleStop() {
+    console.log(`${TIMER_DEBUG_PREFIX} handleStop clicked`, {
+      elapsedTime: timer.elapsedTime,
+      lastGongIndex: lastGongIndexRef.current,
+    });
+    lastGongIndexRef.current = -1;
+    setPrepCountdown(null);
+    timer.stop();
+    timer.reset();
+    audio.cleanup();
+    wakeLock.release();
+  }
+
   useEffect(() => {
     if (prepCountdown === null) return;
 
@@ -76,6 +107,9 @@ export default function Home() {
       setPrepCountdown((prev) => {
         if (prev === null) return prev;
         if (prev <= 1) {
+          console.log(`${TIMER_DEBUG_PREFIX} preparation complete; starting timer + start gong`, {
+            prepCountdown: prev,
+          });
           timerStartRef.current();
           playStartGongRef.current();
           return null;
@@ -107,15 +141,34 @@ export default function Home() {
     const durationSeconds = duration * 60;
 
     // Anti-double-gong: don't trigger interval gong at session end
-    if (timer.elapsedTime >= durationSeconds) return;
+    if (timer.elapsedTime >= durationSeconds) {
+      console.log(`${TIMER_DEBUG_PREFIX} interval effect skipped at session end boundary`, {
+        elapsedTime: timer.elapsedTime,
+        durationSeconds,
+      });
+      return;
+    }
 
     const currentGongIndex = Math.floor(timer.elapsedTime / intervalSeconds);
-
-    if (
+    const shouldTriggerIntervalGong =
       currentGongIndex > lastGongIndexRef.current &&
       currentGongIndex > 0 &&
-      currentGongIndex <= totalGongs
-    ) {
+      currentGongIndex <= totalGongs;
+
+    if (shouldTriggerIntervalGong) {
+      console.log(`${TIMER_DEBUG_PREFIX} interval gong condition met`, {
+        elapsedTime: timer.elapsedTime,
+        intervalSeconds,
+        durationSeconds,
+        currentGongIndex,
+        lastGongIndex: lastGongIndexRef.current,
+        totalGongs,
+        audioReady: audio.isReady,
+        audioError: audio.error,
+      });
+    }
+
+    if (shouldTriggerIntervalGong) {
       if (audio.isReady) {
         audio.playIntervalGong();
       } else if (audio.error !== null && progressRef.current) {
@@ -129,6 +182,9 @@ export default function Home() {
         }, 500);
       }
       lastGongIndexRef.current = currentGongIndex;
+      console.log(`${TIMER_DEBUG_PREFIX} lastGongIndex updated`, {
+        lastGongIndex: lastGongIndexRef.current,
+      });
     }
   }, [timer.elapsedTime, timer.isRunning, interval, duration, audio, totalGongs]);
 
@@ -158,22 +214,6 @@ export default function Home() {
     if (newInterval <= duration) {
       setInterval(newInterval);
     }
-  }
-
-  async function handleStart() {
-    lastGongIndexRef.current = -1;
-    await audio.init();
-    wakeLock.request();
-    setPrepCountdown(PREP_COUNTDOWN_SECONDS);
-  }
-
-  function handleStop() {
-    lastGongIndexRef.current = -1;
-    setPrepCountdown(null);
-    timer.stop();
-    timer.reset();
-    audio.cleanup();
-    wakeLock.release();
   }
 
   return (
