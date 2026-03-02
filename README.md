@@ -64,3 +64,22 @@ docker run -p 3000:3000 meditation
 - TypeScript
 - Tailwind CSS v4
 - Serwist (PWA/Service Worker)
+
+## Debugging iPhone audio issues (double gong)
+
+The app now emits detailed console logs with these prefixes:
+
+- `[meditation-timer-debug]` (timer lifecycle + gong trigger conditions)
+- `[meditation-audio-debug]` (audio init/playback/anti-duplicate guard)
+
+### How to view iPhone Safari console logs on your Mac
+
+1. On iPhone, open **Settings → Safari → Advanced** and enable **Web Inspector**.
+2. Connect the iPhone to your Mac with a cable (or same Wi-Fi + trusted pairing).
+3. On Mac Safari, enable the developer menu via **Safari → Settings → Advanced → Show Develop menu in menu bar**.
+4. Open the meditation app in Safari on the iPhone.
+5. On the Mac, go to **Develop → _Your iPhone Name_ → _current page_**.
+6. In the Web Inspector, open the **Console** tab and reproduce the issue.
+7. Filter logs by `meditation-timer-debug` or `meditation-audio-debug`.
+
+Tip: capture timestamps around the duplicate gongs (especially near session end) and share the console extract.
