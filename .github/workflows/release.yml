@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-main
+  queue: max
+
+jobs:
+  validate:
+    uses: ./.github/workflows/ci.yml
+
+  tag:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Create version tag
+        id: release
+        run: node .github/scripts/release-tag.mjs
+
+  publish:
+    needs: tag
+    permissions:
+      contents: read
+      packages: write
+    # Tags pushed with GITHUB_TOKEN do not start push-triggered workflows.
+    # Call the publisher explicitly with the tag that was just created.
+    uses: ./.github/workflows/docker.yml
+    with:
+      tag: ${{ needs.tag.outputs.tag }}
