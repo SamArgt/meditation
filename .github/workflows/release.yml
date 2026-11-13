@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version: "26"
       - name: Create version tag
         id: release
         run: node .github/scripts/release-tag.mjs
